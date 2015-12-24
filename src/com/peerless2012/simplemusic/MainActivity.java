@@ -37,14 +37,15 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 		public void handleMessage(Message msg) {
 			super.handleMessage(msg);
 			switch (msg.what) {
-			case UPDATE_MUSIC_INFO:
+			case UPDATE_MUSIC_INFO://更新进度以及音乐信息
 				MusicInfo newInfo = (MusicInfo) msg.obj;
-				if (newInfo != null && newInfo.isUseful()) {
-					if (preMusicInfo == null ||(preMusicInfo != null &&preMusicInfo.getChangeId() != newInfo.getChangeId())) {
+				if (newInfo != null && newInfo.isUseful()) {//有音乐数据
+					if (preMusicInfo == null ||(preMusicInfo != null &&preMusicInfo.getChangeId() != newInfo.getChangeId())) {//如果是一个新的音乐，则更新SeekBar的max和总时间
 						musicSeekBar.setMax(newInfo.getDuration());
 						musicDuration.setText(DateUtils.changSecondsToTime(newInfo.getDuration() / 1000));
 						preMusicInfo = newInfo;
 					}
+					//更新进度和时间
 					currentTime.setText(DateUtils.changSecondsToTime(newInfo.getProgress() / 1000));
 					musicSeekBar.setProgress(newInfo.getProgress());
 				}
@@ -80,6 +81,7 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				iMusic = (IMusic) service;
+				//绑定服务后开启子线程轮询查询当前播放的状态等信息
 				progressThread = new ProgressThread();
 				progressThread.start();
 			}
@@ -121,9 +123,12 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 	
 	@Override
 	protected void onDestroy() {
+		//界面销毁时要关闭子线程，防止内存泄漏
 		if (progressThread != null) {
 			progressThread.stopProgressThread();
 		}
+		
+		//界面销毁的时候清除掉次Handle发送的所有message和callback，防止内存泄漏
 		if (updateHandle != null) {
 			updateHandle.removeCallbacksAndMessages(null);
 		}
@@ -161,6 +166,10 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 		
 		private boolean isRunning = true;
 		
+		/**
+		 * 关闭死循环的子线程
+		 * <h2>子线程是用来获取当前的进度，更新界面的，界面关闭后，这个线程也没必要存在了，当界面重新打开的时候从新开始线程即可</h2>
+		 */
 		public void stopProgressThread() {
 			isRunning = false;
 		}
@@ -170,10 +179,13 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 			super.run();
 			while (isRunning) {
 				if (iMusic != null) {
+					//获取当前信息
 					MusicInfo musicInfo = iMusic.getMusicInfo();
 					Message msg = updateHandle.obtainMessage();
 					msg.what = UPDATE_MUSIC_INFO;
 					msg.obj = musicInfo;
+					
+					//发送到主线程更新界面
 					updateHandle.sendMessage(msg);
 				}
 				SystemClock.sleep(1000);

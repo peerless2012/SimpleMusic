@@ -9,9 +9,8 @@ public class BaseActivity extends Activity{
 	protected <T extends View> T getView(Activity activity,int viewResId) {
 		return (T)activity.findViewById(viewResId);
 	}
-	@SuppressWarnings("unchecked")
 	protected <T extends View> T getView(int viewResId) {
-		return (T)this.findViewById(viewResId);
+		return getView(this,viewResId);
 	}
 	@SuppressWarnings("unchecked")
 	protected <T extends View> T getView(View parent,int viewResId) {

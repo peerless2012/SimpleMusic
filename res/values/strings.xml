@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SimpleMusic</string>
+    <string name="hello_world">Hello world!</string>
+
+    <!-- 首页 -->
+    <string name="play">开始</string>
+    <string name="pause">暂停</string>
+    <string name="stop">停止</string>
+    <string name="continuePlay">继续</string>
+</resources>

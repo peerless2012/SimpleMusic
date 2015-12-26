@@ -1,9 +1,14 @@
 package com.peerless2012.simplemusic;
 
+import com.peerless2012.simplemusic.utils.FastBlur;
+
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,6 +37,9 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 	private IMusic iMusic;
 	
 	private MusicInfo preMusicInfo;
+	
+	private MusicCoverView musicCoverView;
+	
 	private class UpdateHandle extends Handler{
 		@Override
 		public void handleMessage(Message msg) {
@@ -119,6 +127,7 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 		musicSeekBar = getView(R.id.music_seek_bar);
 		currentTime = getView(R.id.current_time);
 		musicDuration = getView(R.id.music_duration);
+		musicCoverView = getView(R.id.music_cover);
 	}
 	
 	@Override
@@ -143,16 +152,21 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 		
 		switch (v.getId()) {
 			case R.id.play:
+				musicCoverView.setMusicPic(R.drawable.love_in_morden_times);
 				iMusic.play();
+				musicCoverView.startRotate();
 				break;
 			case R.id.pasue:
 				iMusic.pause();
+				musicCoverView.stopRotate();;
 				break;
 			case R.id.continuePlay:
+				musicCoverView.startRotate();
 				iMusic.continuePlay();
 				break;
 			case R.id.stop:
 				iMusic.stop();
+				musicCoverView.stopRotate();;
 				break;
 	
 			default:

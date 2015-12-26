@@ -54,7 +54,7 @@ public class MusicService extends Service {
 
 		@Override
 		public void play() {
-			AssetFileDescriptor resourceFd = getResources().openRawResourceFd(R.raw.little_frog);
+			AssetFileDescriptor resourceFd = getResources().openRawResourceFd(R.raw.love_in_morden_times);
 			try {
 				//重置，减少new操作
 				mediaPlayer.reset();

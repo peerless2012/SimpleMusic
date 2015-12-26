@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 
+    
     <LinearLayout
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -31,7 +33,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="left|center_vertical"
-                android:text="00.43" />
+                android:text="00.00" />
 
             <TextView
                 android:id="@+id/music_duration"
@@ -40,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:gravity="right|center_vertical"
-                android:text="04:23" />
+                android:text="00:00" />
         </LinearLayout>
 
         <LinearLayout
@@ -68,7 +70,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/continuePlay" />
-
             <Button
                 android:id="@+id/stop"
                 android:layout_width="0dp"
@@ -78,4 +79,10 @@
         </LinearLayout>
     </LinearLayout>
 
+    
+    <com.peerless2012.simplemusic.MusicCoverView 
+        android:id="@+id/music_cover"
+        android:layout_above="@id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </RelativeLayout>

@@ -1,7 +1,6 @@
 package com.peerless2012.simplemusic;
 
 import com.peerless2012.simplemusic.MusicCoverView.MusicAnimListener;
-
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;

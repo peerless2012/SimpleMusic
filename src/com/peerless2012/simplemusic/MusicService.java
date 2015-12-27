@@ -1,13 +1,9 @@
 package com.peerless2012.simplemusic;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;

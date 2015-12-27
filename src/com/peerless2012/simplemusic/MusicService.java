@@ -1,6 +1,9 @@
 package com.peerless2012.simplemusic;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -19,6 +22,8 @@ public class MusicService extends Service {
 
 	private MediaPlayer mediaPlayer;
 	
+	private AssetFileDescriptor resourceFd;
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return new MusicBinder();
@@ -27,16 +32,6 @@ public class MusicService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
-			
-			@Override
-			public void onCompletion(MediaPlayer mp) {
-				mediaPlayer.stop();
-				musicInfo.setStatus(MusicInfo.STATUS_STOP);
-			}
-		});
 	}
 	
 	@Override
@@ -47,6 +42,13 @@ public class MusicService extends Service {
 			mediaPlayer.release();
 			mediaPlayer = null;
 		}
+		if (resourceFd != null) {
+			try {
+				resourceFd.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		super.onDestroy();
 	}
 	
@@ -54,12 +56,25 @@ public class MusicService extends Service {
 
 		@Override
 		public void play() {
-			AssetFileDescriptor resourceFd = getResources().openRawResourceFd(R.raw.love_in_morden_times);
 			try {
 				//重置，减少new操作
-				mediaPlayer.reset();
-				mediaPlayer.setDataSource(resourceFd.getFileDescriptor());
-				mediaPlayer.prepareAsync();
+				if (mediaPlayer != null) {
+					mediaPlayer.reset();
+					mediaPlayer.release();
+					mediaPlayer = null;
+				}
+				mediaPlayer = MediaPlayer.create(MusicService.this, R.raw.love_in_morden_times);
+				mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+					
+					@Override
+					public void onCompletion(MediaPlayer mp) {
+						mediaPlayer.stop();
+						if (musicInfo != null) musicInfo.setStatus(MusicInfo.STATUS_STOP);
+					}
+				});
+//				mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//				mediaPlayer.setDataSource(resourceFd.getFileDescriptor());
+//				mediaPlayer.prepareAsync();
 				mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 					
 					@Override
@@ -73,7 +88,7 @@ public class MusicService extends Service {
 						musicInfo.setStatus(MusicInfo.STATUS_PLAYING);
 					}
 				});
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}

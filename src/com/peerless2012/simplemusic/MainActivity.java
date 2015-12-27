@@ -1,19 +1,17 @@
 package com.peerless2012.simplemusic;
 
-import com.peerless2012.simplemusic.utils.FastBlur;
+import com.peerless2012.simplemusic.MusicCoverView.MusicAnimListener;
 
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.SeekBar;
@@ -56,6 +54,9 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 					//更新进度和时间
 					currentTime.setText(DateUtils.changSecondsToTime(newInfo.getProgress() / 1000));
 					musicSeekBar.setProgress(newInfo.getProgress());
+				}
+				if (newInfo != null && newInfo.getStatus() == MusicInfo.STATUS_STOP && musicCoverView.isRotating()) {
+					musicCoverView.stopRotate();
 				}
 				break;
 
@@ -121,6 +122,15 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 			}
 		});
+		
+		musicCoverView.setOnStartAnimListener(new MusicAnimListener() {
+			
+			@Override
+			public void onStartAnimFinish() {
+				iMusic.play();
+//				Log.i("MainActivity", "动画执行完成");
+			}
+		});
 	}
 
 	private void initView() {
@@ -153,20 +163,19 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 		switch (v.getId()) {
 			case R.id.play:
 				musicCoverView.setMusicPic(R.drawable.love_in_morden_times);
-				iMusic.play();
 				musicCoverView.startRotate();
 				break;
 			case R.id.pasue:
+				musicCoverView.pause();
 				iMusic.pause();
-				musicCoverView.stopRotate();;
 				break;
 			case R.id.continuePlay:
-				musicCoverView.startRotate();
+				musicCoverView.continueRotate();
 				iMusic.continuePlay();
 				break;
 			case R.id.stop:
-				iMusic.stop();
 				musicCoverView.stopRotate();;
+				iMusic.stop();
 				break;
 	
 			default:
@@ -198,7 +207,6 @@ public class MainActivity extends BaseActivity implements OnClickListener{
 					Message msg = updateHandle.obtainMessage();
 					msg.what = UPDATE_MUSIC_INFO;
 					msg.obj = musicInfo;
-					
 					//发送到主线程更新界面
 					updateHandle.sendMessage(msg);
 				}
